@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+  mongodb:
+    image: mongo
+    restart: always
+    env_file: ./.env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGODB_USER
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGODB_PASSWORD
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/db:/data/db
+
+  backend:
+    container_name: backend
+    image: backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongodb
+
+  frontend:
+    container_name: frontend
+    image: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile  # Point to your frontend Dockerfile
+    restart: always
+    depends_on:
+      - backend
+
+  nginx:
+    container_name: nginx
+    depends_on:
+      - frontend
+      - backend
+    restart: always # because it is routing traffic to our entire app
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./certbot-etc:/etc/letsencrypt
+      - ./certbot-var:/var/lib/letsencrypt
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./certbot-etc:/etc/letsencrypt
+      - ./certbot-var:/var/lib/letsencrypt
+    depends_on:
+      - nginx
+    command: sh -c "mkdir -p /usr/share/nginx/html && certonly --webroot --webroot-path=/usr/share/nginx/html --email reknewal@reknewalcoaching.com --agree-tos --no-eff-email -d admin.reknewalcoaching.com"

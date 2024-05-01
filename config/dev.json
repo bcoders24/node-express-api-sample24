@@ -1,0 +1,32 @@
+{
+  "env": "dev",
+  "mongodb": {
+    "database": "demo_db",
+    "host": "mongodb://bcoderbiz:bcoderbiz345@93.127.199.69:27017/demo_db?authSource=admin"
+  },
+  "webServer": {
+    "baseUrl": "https://demo.bcoder.co.in",
+    "port": 3000
+  },
+  "auth": {
+    "sessionType": "multiple",
+    "secret": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
+    "refreshSecret": "UHVJhbjhbvfeHbbJKcndKJbBKkbkjbBKBbkb",
+    "tokenPeriod": 300000,
+    "refreshPeriod": 30
+  },
+  "aws": {
+    "key": "AKIA6ODU3TZKKXRCOZDP",
+    "secret": "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",
+    "bucket": "bcoder24",
+    "folder": "demo"
+  },
+  "logger": {
+    "console": {
+      "level": "debug",
+      "handleExceptions": true,
+      "json": false,
+      "colorize": true
+    }
+  }
+}
