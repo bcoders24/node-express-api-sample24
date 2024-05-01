@@ -1,18 +1,22 @@
 require('dotenv').config();
 const { app } = require('./app');
 const http = require('http');
-const  server = http.createServer(app);
-const socketConnection = require('./src/socket/app');
-
+const server = http.createServer(app);
+const io = require('socket.io')(server);
 const logger = require('./helpers/logger')();
 const webServer = require('config').get('webServer');
 global.ApiError = require('./helpers/ApiError');
 
-
+io.on('connection', (socket) => {
+    console.log('A user connected');
+    // Handle socket disconnection
+    socket.on('disconnect', () => {
+      console.log('A user disconnected');
+    });
+  });
 try {
     require('./helpers/string');
     require('./settings/database').configure();
-    socketConnection.configure(server)
 } catch (err) {
     console.log(err);
 }

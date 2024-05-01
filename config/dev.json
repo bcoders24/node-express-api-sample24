@@ -6,7 +6,7 @@
   },
   "webServer": {
     "baseUrl": "https://demo.bcoder.co.in",
-    "port": 3000
+    "port": 4000
   },
   "auth": {
     "sessionType": "multiple",
