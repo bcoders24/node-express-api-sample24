@@ -9,35 +9,36 @@ const morgan = require('./helpers/morgan');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const endpoints = require('express-list-endpoints-descriptor')(express);
 const routes = require('./settings/routes');
-const multer = require("multer");
+const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 const onboardingApp = require('./src/auth/app');
 const mediaModule = require('./src/media/app');
 
-const http = require('http');
-
 const app = express();
-const server = http.createServer(app);
-app.use(function (err, req, res, next) {
-    if (err) {
-        (res.log || log).error(err.stack);
-        if (req.xhr) {
-            res.send(500, { error: 'Something went wrong!' });
-        } else {
-            next(err);
-        }
 
-        return;
+app.use(function (err, req, res, next) {
+  if (err) {
+    (res.log || log).error(err.stack);
+    if (req.xhr) {
+      res.send(500, { error: 'Something went wrong!' });
+    } else {
+      next(err);
     }
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    next();
+
+    return;
+  }
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  next();
 });
 
 if (config.env !== 'dev') {
-    // app.use(morgan.successHandler);
-    // app.use(morgan.errorHandler);
+  // app.use(morgan.successHandler);
+  // app.use(morgan.errorHandler);
 }
 
 // set security HTTP headers
@@ -68,14 +69,10 @@ routes.configure(app, endpoints);
 onboardingApp.configure(app, endpoints);
 mediaModule.configure(app, endpoints);
 
-
-
 // convert error to CustomError, if needed
 app.use(errorConverter);
 
 // handle error
 app.use(errorHandler);
 
-
-
-module.exports = { app ,server};
+module.exports = { app };
