@@ -1,39 +1,43 @@
 'use strict';
-const base = require('../../../api/api-base')(__dirname, 'users', 'user');
-const userService = require('../services/users');
-const userMapper = require('../mappers/user');
 
-exports.create = async (req, res) => {
-    let retVal = await base.create(req);
-    return res.data(retVal);
+import base from '../../../api/api-base';
+import userService from '../services/users';
+import userMapper from '../mappers/user';
+
+const __dirname = new URL('.', import.meta.url).pathname;
+const apiBase = base(__dirname, 'users', 'user');
+
+export const create = async (req, res) => {
+  let retVal = await apiBase.create(req);
+  return res.data(retVal);
 };
 
-exports.update = async (req, res) => {
-    let retVal = await base.update(req);
-    return res.data(retVal);
+export const update = async (req, res) => {
+  let retVal = await apiBase.update(req);
+  return res.data(retVal);
 };
 
-exports.search = async (req, res) => {
-    let retVal = await base.search(req);
-    return res.page(retVal);
+export const search = async (req, res) => {
+  let retVal = await apiBase.search(req);
+  return res.page(retVal);
 };
 
-exports.get = async (req, res) => {
-    let retVal = await base.get(req);
-    return res.data(retVal);
+export const get = async (req, res) => {
+  let retVal = await apiBase.get(req);
+  return res.data(retVal);
 };
 
-exports.delete = async (req, res) => {
-    let retVal = await base.delete(req);
-    return res.success(retVal);
+export const remove = async (req, res) => {
+  let retVal = await apiBase.delete(req);
+  return res.success(retVal);
 };
 
-exports.connectWithProfile = async (req, res) => {
-    let retVal = await userService.connectWithProfile(req.body, req.user)
-    return res.data(userMapper.toModel(retVal))
-}
+export const connectWithProfile = async (req, res) => {
+  let retVal = await userService.connectWithProfile(req.body, req.user);
+  return res.data(userMapper.toModel(retVal));
+};
 
-exports.connectedProfileRemove = async (req, res) => {
-    await userService.connectedProfileRemove(req.body, req.user)
-    return res.success('Connected profile removed successfully')
-}
+export const connectedProfileRemove = async (req, res) => {
+  await userService.connectedProfileRemove(req.body, req.user);
+  return res.success('Connected profile removed successfully');
+};

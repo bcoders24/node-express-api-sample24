@@ -1,24 +1,27 @@
-const express = require('express');
-const helmet = require('helmet');
-const xss = require('xss-clean');
-const mongoSanitize = require('express-mongo-sanitize');
-const cookieParser = require('cookie-parser');
-const cors = require('cors');
-const config = require('config');
-const morgan = require('./helpers/morgan');
-const { errorConverter, errorHandler } = require('./middlewares/error');
-const endpoints = require('express-list-endpoints-descriptor')(express);
-const routes = require('./settings/routes');
-const multer = require("multer");
-const upload = multer({ storage: multer.memoryStorage() });
-const onboardingApp = require('./src/auth/app');
-const mediaModule = require('./src/media/app');
+import express from 'express';
+import helmet from 'helmet';
+import xss from 'xss-clean';
+import mongoSanitize from 'express-mongo-sanitize';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import config from 'config';
+import morgan from './helpers/morgan';
+import { errorConverter, errorHandler } from './middlewares/error';
+import expressListEndpoints from 'express-list-endpoints-descriptor';
+import routes from './settings/routes';
+import multer from "multer";
 
-const http = require('http');
+import onboardingApp from './src/auth/app';
+import mediaModule from './src/media/app';
+import http from 'http';
+
+const upload = multer({ storage: multer.memoryStorage() });
+const { createServer } = http;
 
 const app = express();
-const server = http.createServer(app);
-app.use(function (err, req, res, next) {
+const server = createServer(app);
+
+app.use((err, req, res, next) => {
     if (err) {
         (res.log || log).error(err.stack);
         if (req.xhr) {
@@ -26,7 +29,6 @@ app.use(function (err, req, res, next) {
         } else {
             next(err);
         }
-
         return;
     }
     res.header("Access-Control-Allow-Origin", "*");
@@ -64,11 +66,9 @@ app.options('*', cors());
 app.use(cookieParser());
 
 //routes
-routes.configure(app, endpoints);
-onboardingApp.configure(app, endpoints);
-mediaModule.configure(app, endpoints);
-
-
+routes.configure(app, expressListEndpoints(express));
+onboardingApp.configure(app, expressListEndpoints(express));
+mediaModule.configure(app, expressListEndpoints(express));
 
 // convert error to CustomError, if needed
 app.use(errorConverter);
@@ -76,6 +76,4 @@ app.use(errorConverter);
 // handle error
 app.use(errorHandler);
 
-
-
-module.exports = { app ,server};
+export { app, server };

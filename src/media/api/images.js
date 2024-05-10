@@ -1,27 +1,27 @@
 "use strict";
-const s3 = require('../providers/s3')
-const crypto = require("crypto")
-const { isEmpty } = require("underscore");
+import s3 from '../providers/s3';
+import crypto from "crypto";
+import { isEmpty } from "underscore";
 
-//single image Upload;
+// Single image Upload;
 /**
  * Uploads a single image to Amazon S3.
  * @param {Object} req - The request object containing uploaded files.
  * @param {Object} res - The response object to send back a response.
  * @throws {ApiError} - Throws an error if no image is provided in the request.
  */
-exports.imageUpload = async (req, res) => {
+export const imageUpload = async (req, res) => {
     let uploadData = req.files;
 
     if (isEmpty(uploadData)) {
-        throw new ApiError("image required")
+        throw new ApiError("image required");
     }
 
     let data = await s3.uploadToS3(uploadData[0], crypto.randomBytes(20).toString('hex'));
     if (data) {
         return res.data({ url: data.Location });
     }
-}
+};
 
 
 /**
@@ -30,7 +30,7 @@ exports.imageUpload = async (req, res) => {
  * @param {Object} res - The response object to send back a response.
  * @throws {ApiError} - Throws an error if no images are provided in the request.
  */
-exports.bulkUpload = async (req, res) => {
+export const bulkUpload = async (req, res) => {
     let uploadData = req.files;
 
     if (isEmpty(uploadData)) {
@@ -46,7 +46,7 @@ exports.bulkUpload = async (req, res) => {
     const results = await Promise.allSettled(uploadPromises);
     const output = results.filter((result) => result.status === 'fulfilled').map((result) => result.value);
     return res.data({ urls: output });
-}
+};
 
 
 /**
@@ -56,7 +56,7 @@ exports.bulkUpload = async (req, res) => {
  * @throws {Error} - Throws an error if the image deletion process fails.
  */
 
-exports.delete = async (req, res) => {
+export const deleteImage = async (req, res) => {
     await s3.deleteImage(req.body.url);
     return res.success("image deleted from s3 bucket successfully");
-}
+};
